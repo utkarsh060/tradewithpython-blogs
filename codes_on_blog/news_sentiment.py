@@ -43,29 +43,36 @@ if company_name != '':
     # print(df)
 
     try:
-        # now sometimes article package might not be able to download an article so exception handling is needed.
-        lst = []
+        list =[] #creating an empty list 
         for i in df.index:
-            dct = {}
-            article = Article(df['link'][i], config=config)
-            article.download()
-            article.parse()
-            article.nlp()
-            dct['Date'] = df['date'][i]
-            dct['Media'] = df['media'][i]
-            dct['Title'] = article.title
-            dct['Article'] = article.text
-            dct['Summary'] = article.summary
-            dct['Key_words'] = article.keywords
-            lst.append(dct)
-        news_df = pd.DataFrame(lst)
-        print(news_df)
+            dict = {} #creating an empty dictionary to append an article in every single iteration
+            article = Article(df['link'][i],config=config) #providing the link
+            try:
+              article.download() #downloading the article 
+              article.parse() #parsing the article
+              article.nlp() #performing natural language processing (nlp)
+            except:
+               pass 
+            #storing results in our empty dictionary
+            dict['Date']=df['date'][i] 
+            dict['Media']=df['media'][i]
+            dict['Title']=article.title
+            dict['Article']=article.text
+            dict['Summary']=article.summary
+            dict['Key_words']=article.keywords
+            list.append(dict)
+        check_empty = not any(list)
+        # print(check_empty)
+        if check_empty == False:
+          news_df=pd.DataFrame(list) #creating dataframe
+          print(news_df)
 
     except Exception as e:
+        #exception handling
         print("exception occurred:" + str(e))
-        print('Looks like, there is some error in retrieving the data, Please try again or try with a different ticker.')
+        print('Looks like, there is some error in retrieving the data, Please try again or try with a different ticker.' )
 
-
+    
     # Sentiment Analysis
     def percentage(part, whole):
         return 100 * float(part) / float(whole)
